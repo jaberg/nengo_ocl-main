@@ -1,29 +1,47 @@
-import pyopencl as cl
+try:
+    # For Python <=2.6
+    import unittest2 as unittest
+except ImportError:
+    import unittest
 
-from nengo.tests.helpers import simulator_test_cases
+import pyopencl as cl
+from nengo.tests.helpers import load_nengo_tests, simulator_test_suite
 
 from nengo_ocl import sim_ocl
 
-# TODO:
-# If PYOPENCL_CTX is not set, loop over all available devices
-ctx = cl.create_some_context()
 
-# -- Black-box testing:
-#    Run each of the nengo simulator TestCase objects
-#    using sim_ocl.Simulator.
-for TestCase in simulator_test_cases:
-    class MyTestCase(TestCase):
-        simulator_test_case_ignore = True
-        def Simulator(self, model):
-            rval = sim_ocl.Simulator(ctx, model)
-            rval.alloc_all()
-            rval.plan_all()
-            return rval
-    MyTestCase.__name__ = TestCase.__name__
-    globals()[TestCase.__name__] = MyTestCase
-    # -- delete these symbols so that nose will not
-    #    detect and run them as extra unit tests.
-    del MyTestCase
-    del TestCase
+ctx = cl.create_some_context(interactive=False)
+
+from nengo_ocl import sim_ocl
+
+def simulator_allocator(*args, **kwargs):
+    rval = sim_ocl.Simulator(ctx, *args, **kwargs)
+    rval.alloc_all()
+    rval.plan_all()
+    return rval
+
+load_tests = load_nengo_tests(simulator_allocator)
+
+try:
+    import nose  # If we have nose, maybe we're doing nosetests.
+
+    # Stop some functions from running automatically
+    load_nengo_tests.__test__ = False
+    load_tests.__test__ = False
+    simulator_test_suite.__test__ = False
+
+    # unittest won't try to run this, but nose will
+    def test_nengo():
+        nengo_suite = simulator_test_suite(simulator_allocator)
+
+        # Unfortunately, this makes us run nose twice,
+        # which gives two sets of results.
+        # I don't know a way around this.
+        assert nose.run(suite=nengo_suite, exit=False)
+
+except ImportError:
+    pass
 
 
+if __name__ == "__main__":
+    unittest.main()
