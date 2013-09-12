@@ -10,14 +10,14 @@ you can still run individual test files like this:
 """
 
 from nengo_ocl.tricky_imports import unittest
-
-import nengo.tests.helpers
-
+from nengo.tests.helpers import NengoTestLoader
+from nengo.tests.helpers import load_nengo_tests
 from nengo_ocl import sim_npy2
 
-def simulator_allocator(model):
-    rval = sim_npy2.Simulator(model)
-    rval.plan_all()
-    return rval
+def Npy2Simulator(model):
+    return sim_npy2.Simulator(model)
 
-globals().update(simulator_suite(simulator_allocator))
+load_tests = load_nengo_tests(Npy2Simulator)
+
+if __name__ == '__main__':
+   unittest.main(testLoader=NengoTestLoader(Npy2Simulator))
