@@ -957,8 +957,7 @@ class Simulator(object):
             )]
 
     def plan_ragged_gather_gemv(self, alpha, A, A_js, X, X_js,
-                                beta, Y, Y_in=None, tag=None, seq=None,
-                                gamma=None):
+                                beta, Y, Y_in=None, tag=None, seq=None):
         fn = lambda: ragged_gather_gemv(alpha, A, A_js, X, X_js, beta, Y,
                                         Y_in=Y_in, gamma=gamma,
                                         tag=tag,
