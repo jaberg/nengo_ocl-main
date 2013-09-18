@@ -106,7 +106,7 @@ def plan_probes(queue, sim_step, periods, X, Y, tag=None):
     max_len = min(queue.device.max_work_group_size, max(X.shape0s))
     gsize = (max_len, N,)
     lsize = (max_len, 1)
-    rval = Plan(queue, _fn, gsize, lsize=lsize, name="probes", tag=tag)
+    rval = Plan(queue, _fn, gsize, lsize=lsize, name="cl_probes", tag=tag)
     rval.full_args = full_args     # prevent garbage-collection
     rval.cl_bufpositions = cl_bufpositions
     rval.Y = Y
@@ -155,7 +155,7 @@ def plan_lif(queue, J, V, W, OV, OW, OS, ref, tau, dt,
     text = Template(text, output_encoding='ascii').render(**textconf)
 
     return _plan_template(
-        queue, "lif_step", text, declares=declares,
+        queue, "cl_lif", text, declares=declares,
         tag=tag, n_elements=n_elements,
         inputs=inputs, outputs=outputs, parameters=parameters)
 
@@ -169,7 +169,7 @@ def plan_lif_rate(queue, J, R, ref, tau, dt, tag=None, n_elements=0):
             """ % dict(dt=dt)
 
     return _plan_template(
-        queue, "lif_rate", text, tag=tag, n_elements=n_elements,
+        queue, "cl_lif_rate", text, tag=tag, n_elements=n_elements,
         inputs=inputs, outputs=outputs, parameters=parameters)
 
 def _plan_template(queue, name, core_text, declares="", tag=None, n_elements=0,
