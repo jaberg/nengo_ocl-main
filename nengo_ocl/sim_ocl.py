@@ -132,7 +132,6 @@ class Simulator(sim_npy.Simulator):
         #for probe in self.model.probes:
             #self.probe_outputs[probe] = np.vstack(self.probe_outputs[probe])
 
-        print self.profiling
         if self.profiling > 1:
             self.print_profiling()
 
