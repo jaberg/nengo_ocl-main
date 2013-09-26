@@ -52,17 +52,6 @@ class Simulator(sim_npy.Simulator):
     def plan_ragged_gather_gemv(self, *args, **kwargs):
         return plan_ragged_gather_gemv(self.queue, *args, **kwargs)
 
-    def plan_direct(self, nls):
-        ### TODO: this is sub-optimal, since it involves copying everything
-        ### off the device, running the nonlinearity, then copying back on
-        sidx = self.sidx
-        def direct():
-            for nl in nls:
-                J = self.all_data[sidx[nl.input_signal]]
-                output = nl.fn(J)
-                self.all_data[sidx[nl.output_signal]] = output
-        return PythonPlan(direct, name="direct", tag="direct")
-
     def plan_SimLIF(self, ops):
         J = self.all_data[[self.sidx[op.J] for op in ops]]
         V = self.all_data[[self.sidx[op.voltage] for op in ops]]
