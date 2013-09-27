@@ -16,6 +16,8 @@ from clra_gemv import plan_ragged_gather_gemv
 from clra_nonlinearities import plan_lif, plan_lif_rate
 from plan import Plan, Prog
 
+PROFILING_ENABLE = cl.command_queue_properties.PROFILING_ENABLE
+
 
 class Simulator(sim_npy.Simulator):
 
@@ -36,9 +38,11 @@ class Simulator(sim_npy.Simulator):
             profiling = int(os.getenv("NENGO_OCL_PROFILING", 0))
         self.context = context
         self.profiling = profiling
-        # -- this queue is just for moving data around, not for running
-        #    the simulator steps, so we don't enable profiling on it.
-        self.queue = cl.CommandQueue(context)
+        if self.profiling:
+            self.queue = cl.CommandQueue(context,
+                                         properties=PROFILING_ENABLE)
+        else:
+            self.queue = cl.CommandQueue(context)
 
         self.n_prealloc_probes = n_prealloc_probes
         # -- allocate data
@@ -149,7 +153,7 @@ class Simulator(sim_npy.Simulator):
         ### make and sort table
         table = []
         unknowns = []
-        for p in self._plan:
+        for p in self._dag.order:
             gflops_per_sec = 0
             gbytes_per_sec = 0
             if isinstance(p, BasePlan):
