@@ -28,8 +28,8 @@ class Simulator(sim_npy.Simulator):
         else:
             return CLRaggedArray(self.queue, val)
 
-    def __init__(self, model, context=None, n_prealloc_probes=1000,
-                 profiling=None):
+    def __init__(self, model, dt=0.001, seed=None, builder=None, context=None,
+                 n_prealloc_probes=1000, profiling=None):
         if context is None:
             print 'No context argument was provided to sim_ocl.Simulator'
             print "Calling pyopencl.create_some_context() for you now:"
@@ -46,7 +46,8 @@ class Simulator(sim_npy.Simulator):
 
         self.n_prealloc_probes = n_prealloc_probes
         # -- allocate data
-        sim_npy.Simulator.__init__(self, model)
+        sim_npy.Simulator.__init__(
+            self, model=model, dt=dt, seed=seed, builder=builder)
 
         # -- set up the DAG for executing OCL kernels
         self._plandict = OrderedDict()
