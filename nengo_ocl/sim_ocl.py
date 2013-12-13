@@ -214,6 +214,7 @@ class Simulator(sim_npy.Simulator):
             if has_probes:
                 self.drain_probe_buffers()
             N -= B
+            self.n_steps += B
         if self.profiling > 1:
             self.print_profiling()
 
