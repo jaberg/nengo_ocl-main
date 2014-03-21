@@ -3,18 +3,14 @@ import collections
 import numpy as np
 import pyopencl as cl
 
-import sim_npy
-from .raggedarray import RaggedArray
-from .clraggedarray import CLRaggedArray
-from .clra_gemv import plan_ragged_gather_gemv
-from .clra_nonlinearities import plan_lif, plan_lif_rate, plan_probes
-from .plan import BasePlan, PythonPlan, DAG, Marker
-from .tricky_imports import OrderedDict
-
-from raggedarray import RaggedArray
-from clra_gemv import plan_ragged_gather_gemv
-from clra_nonlinearities import plan_lif, plan_lif_rate
-from plan import Plan, Prog
+import nengo_ocl
+from nengo_ocl import sim_npy
+from nengo_ocl.raggedarray import RaggedArray
+from nengo_ocl.clraggedarray import CLRaggedArray
+from nengo_ocl.clra_gemv import plan_ragged_gather_gemv
+from nengo_ocl.clra_nonlinearities import plan_lif, plan_lif_rate, plan_probes
+from nengo_ocl.plan import BasePlan, PythonPlan, DAG, Marker
+from nengo_ocl.tricky_imports import OrderedDict
 
 PROFILING_ENABLE = cl.command_queue_properties.PROFILING_ENABLE
 
